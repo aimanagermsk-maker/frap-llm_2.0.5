@@ -1,0 +1,52 @@
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Local tooling (not part of the image)
+sql-executor/
+
+# Documentation
+README.md
+*.md
+
+# Logs
+*.log
+
+# Test files
+test/
+tests/
+*_test.py
+test_*.py
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.local.yml
+
+# Local env
+.env
+.env.*

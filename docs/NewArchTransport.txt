@@ -1,0 +1,33 @@
+бд transport
+Песок 10.0.50.181/46.148.205148
+Тестовый контур 172.16.84.107
+
+метаданные документа:
+CREATE TABLE inbox.meta (
+	id bigserial NOT NULL,
+	ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	uri uuid NOT NULL,
+	dtype inbox.doctype NOT NULL,
+	certhumbprint text NOT NULL,
+	fsrarid int8 NOT NULL,
+	dsign varchar(512) NOT NULL,
+	ipaddress inet NOT NULL,
+	CONSTRAINT meta_pkey PRIMARY KEY (id, ts)
+);
+CREATE UNIQUE INDEX inbox_meta_uri ON inbox.meta USING btree (uri);
+
+xml: 
+CREATE TABLE filedata.inboxdata (
+	id bigserial NOT NULL,
+	ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	uri uuid NOT NULL,
+	filedata bytea NOT NULL,
+	chunksize int4 NOT NULL,
+	CONSTRAINT inboxdata_chunksize_check CHECK ((chunksize > 0)),
+	CONSTRAINT inboxdata_pkey PRIMARY KEY (id, ts)
+);
+CREATE INDEX filedata_inboxdata_uri ON filedata.inboxdata USING btree (uri);
+
+Вставка документа может выполнятся чанками. 
+
+SELECT filedata FROM filedata.inboxdata WHERE uri=?  ORDER BY id

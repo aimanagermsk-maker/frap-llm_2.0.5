@@ -1,0 +1,9 @@
+contour: sandbox
+
+logging:
+  app: DEBUG
+
+database:
+  url: jdbc:postgresql://89.108.103.170:5432
+  username: fsrar_user
+  password: Qwerty1234

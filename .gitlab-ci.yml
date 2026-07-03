@@ -1,0 +1,74 @@
+stages:
+  - image_build
+  - image_copy
+  - deploy_trigger
+
+variables:
+  APP_NAME: "frap-llm-helper"
+  GIT_SUBMODULE_STRATEGY: none
+
+image: registry.gitlab-ci.ru/helm:latest
+
+default:
+  tags:
+    - sandbox
+
+image_build:
+  stage: image_build
+  image:
+    name: registry.gitlab-ci.ru/kaniko:latest
+    entrypoint: [""]
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}" > /kaniko/.docker/config.json
+    - >
+      [[ ! -z "$APP_NAME" ]] &&
+      export CI_PROJECT_NAME=$APP_NAME
+  script:
+    - /kaniko/executor --context $CI_PROJECT_DIR
+      --cache=true
+      --dockerfile $CI_PROJECT_DIR/Dockerfile
+      --destination $CI_REGISTRY/$CI_PROJECT_NAME:latest
+      --destination $CI_REGISTRY/$CI_PROJECT_NAME:$CI_COMMIT_SHORT_SHA
+
+retag_image:
+  image:
+    name: registry.gitlab-ci.ru/crane:latest
+    entrypoint: [""]
+  stage: image_copy
+  tags:
+    - test-circuit
+  variables:
+    GODEBUG: x509ignoreCN=0
+  before_script:
+    - mkdir /root/.docker &&
+      echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
+    - >
+      [[ ! -z "$APP_NAME" ]] &&
+      export CI_PROJECT_NAME=$APP_NAME
+  script:
+    - SSL_CERT_FILE=$DOCKERHUB_LOCAL_CERTIFICATE
+    - crane auth login -u developer -p $CI_TEST_PASSWORD dockerhub.local:5000
+    - crane cp $CI_REGISTRY/$CI_PROJECT_NAME:latest dockerhub.local:5000/$CI_PROJECT_NAME:latest
+    - crane cp $CI_REGISTRY/$CI_PROJECT_NAME:$CI_COMMIT_SHORT_SHA dockerhub.local:5000/$CI_PROJECT_NAME:$CI_COMMIT_SHORT_SHA
+  only:
+    refs:
+      - /^develop.*$/
+
+deploy:trigger:
+  stage: deploy_trigger
+  script:
+    - which curl || ( apk --update add curl )
+    - curl -X POST
+      --fail
+      -F token=$DEPLOY_TOKEN
+      -F variables[DEPLOY_IMAGE_TAG]=$CI_COMMIT_SHORT_SHA
+      -F variables[SERVICE_NAME]=$APP_NAME
+      -F ref=deploy/sandbox
+      https://repo.r77.center-inform.ru/api/v4/projects/791/trigger/pipeline
+  allow_failure: true
+  only:
+    refs:
+      - /^develop.*$/
+      - main
+      - master

@@ -1,0 +1,5 @@
+logging:
+  app: INFO
+  uvicorn: INFO
+  uvicorn_access: INFO
+  uvicorn_error: INFO

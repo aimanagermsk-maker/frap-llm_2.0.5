@@ -1,0 +1,29 @@
+# Справочник полей для application.yaml + application-{profile}.yaml
+
+contour: sandbox
+
+logging:
+  app: DEBUG
+  uvicorn: INFO
+  uvicorn_access: INFO
+  uvicorn_error: INFO
+
+# Вариант 1: отдельные поля
+database:
+  url: jdbc:postgresql://89.108.103.170:5432
+  username: fsrar_user
+  password: Qwerty1234
+
+# Вариант 2: одной строкой dsn
+# database:
+#   dsn: postgresql://fsrar_user:Qwerty1234@89.108.103.170:5432
+
+# Вариант 3: dsn без логина/пароля + поля отдельно
+# database:
+#   dsn: postgresql://89.108.103.170:5432
+#   username: fsrar_user
+#   password: Qwerty1234
+
+# Environment (yaml → K8S, UPPERCASE, точки на _):
+# PYTHON_PROFILES_ACTIVE=sandbox
+# DATABASE_URL=jdbc:postgresql://host:5432

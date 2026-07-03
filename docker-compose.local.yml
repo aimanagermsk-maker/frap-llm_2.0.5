@@ -1,0 +1,9 @@
+services:
+  frap-llm-helper:
+    build: .
+    container_name: frap-llm-helper
+    ports:
+      - "8000:8000"
+    environment:
+      PYTHON_PROFILES_ACTIVE: ${PYTHON_PROFILES_ACTIVE:-sandbox}
+    restart: unless-stopped
