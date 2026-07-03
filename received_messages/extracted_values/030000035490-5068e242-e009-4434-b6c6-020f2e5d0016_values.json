@@ -1,0 +1,220 @@
+{
+  "id": 1,
+  "type": "frapclaims",
+  "date": "2026-07-01",
+  "uri": "030000035490-5068e242-e009-4434-b6c6-020f2e5d0016",
+  "productTypeGroup": "Пиво и пивные напитки",
+  "checks": [
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "DeclarationCertificate",
+      "documentDescription": "PDF-копия декларации ЕАЭС",
+      "xmlTags": [
+        "DeclarationNumber"
+      ],
+      "values": {
+        "DeclarationNumber": [
+          "ЕАЭС N RU Д-DE.РА04.В.95229/26"
+        ]
+      },
+      "criteria": "Формат номера: `ЕАЭС N RU Д-XX.XX.XXXXX/YY` (ТР ЕАЭС 047/2018, ст. 5)"
+    },
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "DeclarationCertificate",
+      "documentDescription": "PDF-копия декларации ЕАЭС",
+      "xmlTags": [
+        "DateValidity"
+      ],
+      "values": {
+        "DateValidity": [
+          "2026-06-17",
+          "1970-01-01"
+        ]
+      },
+      "criteria": "Дата регистрации в формате `YYYY-MM-DD`, должна быть ≤ `DocDate` из XML (Формат обмена ЕГАИС, табл. 3.12)"
+    },
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "DeclarationCertificate",
+      "documentDescription": "PDF-копия декларации ЕАЭС",
+      "xmlTags": [
+        "DateExpiration"
+      ],
+      "values": {
+        "DateExpiration": [
+          "2031-06-08",
+          "1970-01-01"
+        ]
+      },
+      "criteria": "Дата окончания действия в формате `YYYY-MM-DD`, должна быть ≥ `DateFirstDelivery` из XML (ТР ТС 021/2011, ст. 23)"
+    },
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "DeclarationCertificate",
+      "documentDescription": "PDF-копия декларации ЕАЭС",
+      "xmlTags": [
+        "Applicant (извлекается из PDF)"
+      ],
+      "values": {
+        "Applicant (извлекается из PDF)": []
+      },
+      "criteria": "Наименование заявителя должно совпадать с `Notifier/UL/FullName` или `Notifier/UL/INN` из XML (Формат обмена ЕГАИС, табл. 3.12)"
+    },
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "DeclarationCertificate",
+      "documentDescription": "PDF-копия декларации ЕАЭС",
+      "xmlTags": [
+        "Manufacturer (извлекается из PDF)"
+      ],
+      "values": {
+        "Manufacturer (извлекается из PDF)": []
+      },
+      "criteria": "Наименование изготовителя должно совпадать с `Producer/FullName` или `CountryOrigin` из XML (Формат обмена ЕГАИС, табл. 3.2.1)"
+    },
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "DeclarationCertificate",
+      "documentDescription": "PDF-копия декларации ЕАЭС",
+      "xmlTags": [
+        "Область применения (текст декларации)"
+      ],
+      "values": {
+        "Область применения (текст декларации)": []
+      },
+      "criteria": "Должна включать код ОКПД2 или ТН ВЭД, указанные в XML `CodOKPD2`/`CodTNVED` (ТР ЕАЭС 047/2018, прил. 1)"
+    },
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "LabelFoto",
+      "documentDescription": "Макет этикетки пива/пивного напитка",
+      "xmlTags": [
+        "BeerType",
+        "ProcessingMethod"
+      ],
+      "values": {
+        "BeerType": [],
+        "ProcessingMethod": []
+      },
+      "criteria": "Указание фильтрации и пастеризации (фильтр./нефильтр., пастеризов./непастеризов.) на этикетке совпадает с XML. ГОСТ Р 58010-2017"
+    },
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "LabelFoto",
+      "documentDescription": "Макет этикетки пива/пивного напитка",
+      "xmlTags": [
+        "OriginalWortExtract"
+      ],
+      "values": {
+        "OriginalWortExtract": []
+      },
+      "criteria": "Массовая доля начального сусла и крепость в заявленном диапазоне. ГОСТ Р 58010-2017"
+    },
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "LabelFoto",
+      "documentDescription": "Макет этикетки пива/пивного напитка",
+      "xmlTags": [
+        "RawMaterials"
+      ],
+      "values": {
+        "RawMaterials": []
+      },
+      "criteria": "Состав сырья указан по убыванию долей. ТР ТС 022/2011 ст. 4"
+    },
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "LabelFoto",
+      "documentDescription": "Макет этикетки пива/пивного напитка",
+      "xmlTags": [
+        "NameAP",
+        "DistinctiveCharacteristics"
+      ],
+      "values": {
+        "NameAP": [
+          {
+            "FullName": "Пиво светлое пастеризованное нефильтрованное неосветленное Либенвайс Хефе-Вайсбир",
+            "TypeBeer": "светлое",
+            "BeerProcessingMethod": [
+              "пастеризованное",
+              "нефильтрованное неосветленное"
+            ]
+          }
+        ],
+        "DistinctiveCharacteristics": [
+          "отсутствует"
+        ]
+      },
+      "criteria": "**Запрет лишнего**: запрещены медицинские рекомендации, указания на тонизирующие свойства (если не соответствует ГОСТ Р 52845-2007), термины «безалкогольное» при крепости >0,5%; запрет недостоверных данных о солоде/хмеле. ТР ТС 022/2011 ст. 4 п. 7; ГОСТ Р 58010-2017 п. 4.4"
+    },
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "TechnicalDocumentation",
+      "documentDescription": "PDF с описанием производства пива",
+      "xmlTags": [
+        "TDNumber",
+        "TINumber",
+        "TDDate",
+        "TIDate"
+      ],
+      "values": {
+        "TDNumber": [
+          "29626"
+        ],
+        "TINumber": [
+          "отсутствует"
+        ],
+        "TDDate": [
+          "2026-06-29"
+        ],
+        "TIDate": [
+          "1970-01-01"
+        ]
+      },
+      "criteria": "Совпадение реквизитов с XML"
+    },
+    {
+      "origin": "РФ/Импорт",
+      "documentType": "TechnicalDocumentation",
+      "documentDescription": "PDF с описанием производства пива",
+      "xmlTags": [
+        "CompositionProducts"
+      ],
+      "values": {
+        "CompositionProducts": [
+          {
+            "Position": [
+              {
+                "Identity": "1",
+                "CompulsoryRawMaterials": "вода подготовленная (исправленная)",
+                "CompulsoryRawMaterialsDescr": "85.00%"
+              },
+              {
+                "Identity": "2",
+                "CompulsoryRawMaterials": "солод пивоваренный пшеничный",
+                "CompulsoryRawMaterialsDescr": "8.00%"
+              },
+              {
+                "Identity": "3",
+                "CompulsoryRawMaterials": "солод пивоваренный ячменный",
+                "CompulsoryRawMaterialsDescr": "6.97%"
+              },
+              {
+                "Identity": "4",
+                "CompulsoryRawMaterials": "хмель",
+                "CompulsoryRawMaterialsDescr": "0.02%"
+              },
+              {
+                "Identity": "5",
+                "CompulsoryRawMaterials": "дрожжи пивные",
+                "CompulsoryRawMaterialsDescr": "0.01%"
+              }
+            ]
+          }
+        ]
+      },
+      "criteria": "Описание затирания, кипячения сусла, брожения, дображивания. Соответствие экстрактивности, крепости, ферментов/добавок ТР ТС 029/2012"
+    }
+  ]
+}

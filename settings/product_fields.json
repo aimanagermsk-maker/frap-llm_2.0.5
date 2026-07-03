@@ -1,0 +1,590 @@
+{
+  "productFields": [
+    {
+      "productTypeGroup": "Вина столовые и виноматериалы",
+      "checks": [
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет лицевой и контр-этикетки потребительской тары",
+          "xmlTags": [
+            "ColoringWineAndSparkWine"
+          ],
+          "criteria": "Совпадение цвета на этикетке с заявленным (белое/розовое/красное). ГОСТ 32030-2013 п. 4.1"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет лицевой и контр-этикетки потребительской тары",
+          "xmlTags": [
+            "SugarContWine"
+          ],
+          "criteria": "Совпадение категории сахара (сухое/полусухое/полусладкое/сладкое). ГОСТ 32030-2013 п. 4.1"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет лицевой и контр-этикетки потребительской тары",
+          "xmlTags": [
+            "AlcVolumeMin",
+            "AlcVolumeMax"
+          ],
+          "criteria": "Значение `% об.` на этикетке входит в указанный диапазон. ТР ТС 022/2011 ст. 4"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет лицевой и контр-этикетки потребительской тары",
+          "xmlTags": [
+            "Capacity"
+          ],
+          "criteria": "Объём тары на этикетке точно совпадает с XML (л/мл). ТР ТС 022/2011 ст. 4"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет лицевой и контр-этикетки потребительской тары",
+          "xmlTags": [
+            "CompulsoryRawMaterialsDescr"
+          ],
+          "criteria": "Сорт винограда и год урожая на этикетке совпадают с XML. Формат ЕГАИС табл. 3.13"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет лицевой и контр-этикетки потребительской тары",
+          "xmlTags": [
+            "OtherRawMaterials"
+          ],
+          "criteria": "Добавки указаны как «функциональный класс + E-код» (напр., антиокислитель E220). ТР ТС 029/2012 прил. 3"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет лицевой и контр-этикетки потребительской тары",
+          "xmlTags": [
+            "DateFirstDelivery"
+          ],
+          "criteria": "Дата розлива на этикетке ≤ `DateFirstDelivery` из XML. ТР ТС 022/2011 ст. 4"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет лицевой и контр-этикетки потребительской тары",
+          "xmlTags": [
+            "ShelfLife",
+            "StorageTemperatureMin",
+            "StorageTemperatureMax"
+          ],
+          "criteria": "При неограниченном сроке годности обязательно указание условий хранения. ТР ТС 022/2011 ст. 4"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет лицевой и контр-этикетки потребительской тары",
+          "xmlTags": [
+            "NameAP",
+            "DistinctiveCharacteristics"
+          ],
+          "criteria": "**Запрет лишнего**: отсутствие указаний на лечебные/профилактические свойства, терминов «био/органик/эко» без подтверждающего знака, недостоверных данных о выдержке. ТР ТС 022/2011 ст. 4 п. 7; ТР ЕАЭС 047/2018 ст. 10"
+        },
+        {
+          "origin": "РФ",
+          "documentType": "TechnologicalInstruction",
+          "documentDescription": "PDF с описанием техпроцессов производства в РФ",
+          "xmlTags": [
+            "TINumber",
+            "TIDate",
+            "TIName"
+          ],
+          "criteria": "OCR-извлечение реквизитов, точное посимвольное совпадение с XML. Формат ЕГАИС табл. 3.12"
+        },
+        {
+          "origin": "РФ",
+          "documentType": "TechnologicalInstruction",
+          "documentDescription": "PDF с описанием техпроцессов производства в РФ",
+          "xmlTags": [
+            "TechReglStandard"
+          ],
+          "criteria": "В тексте документа указаны ссылки на ТР ТС 021/2011, 022/2011, 029/2012, ГОСТ 32030-2013"
+        },
+        {
+          "origin": "РФ",
+          "documentType": "TechnologicalInstruction",
+          "documentDescription": "PDF с описанием техпроцессов производства в РФ",
+          "xmlTags": [
+            "CompositionProducts"
+          ],
+          "criteria": "Технологические стадии, дозы добавок и сырьевой состав совпадают с XML"
+        },
+        {
+          "origin": "Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием техпроцессов в стране происхождения",
+          "xmlTags": [
+            "TDNumber",
+            "TDDate",
+            "TDName"
+          ],
+          "criteria": "OCR-извлечение реквизитов, совпадение с XML. Формат ЕГАИС табл. 3.12"
+        },
+        {
+          "origin": "Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием техпроцессов в стране происхождения",
+          "xmlTags": [
+            "CountryOrigin",
+            "Producer"
+          ],
+          "criteria": "Подтверждение, что документ выпущен/одобрен иностранным производителем (`Country ≠ 643`)"
+        },
+        {
+          "origin": "Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием техпроцессов в стране происхождения",
+          "xmlTags": [
+            "TechReglStandard"
+          ],
+          "criteria": "Наличие ссылок на ТР ТС 021/2011, 022/2011, 029/2012. Текст исключительно на русском языке. Формат ЕГАИС табл. 3.12"
+        }
+      ]
+    },
+    {
+      "productTypeGroup": "Вина игристые и шипучие",
+      "checks": [
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки игристого/шипучего вина",
+          "xmlTags": [
+            "TypeSparkWine",
+            "CO2Pressure"
+          ],
+          "criteria": "Давление CO₂ ≥ 3,0 атм (игристые) или 1,0–2,5 атм (шипучие/жемчужные). ГОСТ 33336-2015 п. 3.1"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки игристого/шипучего вина",
+          "xmlTags": [
+            "SecondaryFermentationMethod"
+          ],
+          "criteria": "Указание способа вторичного брожения (бутылочный/резервуарный) совпадает с XML. ГОСТ 33336-2015 п. 4.2"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки игристого/шипучего вина",
+          "xmlTags": [
+            "SugarContWine"
+          ],
+          "criteria": "Категория сахара (брют натюр, экстра брют, брют и т.д.) на этикетке совпадает с XML. ГОСТ 33336-2015 табл. 2"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки игристого/шипучего вина",
+          "xmlTags": [
+            "NameAP",
+            "DistinctiveCharacteristics"
+          ],
+          "criteria": "**Запрет лишнего**: отсутствие указаний на «шампанское» (кроме продукции из Шампани), лечебных свойств, недостоверных сроков выдержки на осадке. ТР ЕАЭС 047/2018 ст. 10"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием производства игристых вин",
+          "xmlTags": [
+            "TDNumber",
+            "TINumber",
+            "TDDate",
+            "TIDate"
+          ],
+          "criteria": "Совпадение реквизитов с XML"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием производства игристых вин",
+          "xmlTags": [
+            "CompositionProducts"
+          ],
+          "criteria": "Описание стадий: тираж, вторичное брожение, выдержка, ремюаж, дегоржаж, дозаж. Совпадение с XML по давлению CO₂, сахару, крепости"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием производства игристых вин",
+          "xmlTags": [
+            "TechReglStandard"
+          ],
+          "criteria": "Ссылки на ГОСТ 33336-2015, ТР ТС 021/2011, 022/2011, 029/2012"
+        }
+      ]
+    },
+    {
+      "productTypeGroup": "Коньяки и бренди",
+      "checks": [
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки коньяка/бренди",
+          "xmlTags": [
+            "AgeCategory",
+            "MinAgeWine"
+          ],
+          "criteria": "Классификация по выдержке в дубе на этикетке совпадает с XML: Ординарный (≥3 г.), КВ (≥6), КВВК (≥8), КС/ОС/Коллекционный (≥10–20+). ГОСТ 31732-2014; ГОСТ Р 58206-2018"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки коньяка/бренди",
+          "xmlTags": [
+            "AlcVolumeMin",
+            "AlcVolumeMax"
+          ],
+          "criteria": "Крепость ≥ 40,0% об. (допуск ±0,3%). ГОСТ 31732-2014 п. 5.1.3.1"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки коньяка/бренди",
+          "xmlTags": [
+            "RawMaterials",
+            "OtherRawMaterials"
+          ],
+          "criteria": "Состав: дистилляты, вода, колер (при допуске). Отсутствие несанкционированных добавок. ТР ТС 029/2012"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки коньяка/бренди",
+          "xmlTags": [
+            "NameAP",
+            "DistinctiveCharacteristics"
+          ],
+          "criteria": "**Запрет лишнего**: запрет указания выдержки, превышающей фактический возраст дистиллята; запрет термина «коньяк» для продукции не из Франции (если не соответствует ГОСТ Р 58206/ТР ЕАЭС 047); запрет указаний на лечебные свойства. ТР ЕАЭС 047/2018 ст. 10; ГОСТ 31732-2014 п. 4.4"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием дистилляции и выдержки",
+          "xmlTags": [
+            "TDNumber",
+            "TINumber",
+            "TDDate",
+            "TIDate"
+          ],
+          "criteria": "Совпадение реквизитов с XML"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием дистилляции и выдержки",
+          "xmlTags": [
+            "CompositionProducts"
+          ],
+          "criteria": "Описание дистилляции, выдержки в дубе, купажирования, коррекции. Возраст спирта, тип воды, нормы карамели/сахара соответствуют ГОСТ 31732-2014 и ТР ТС 029/2012"
+        }
+      ]
+    },
+    {
+      "productTypeGroup": "Водка и водки особые",
+      "checks": [
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки водки",
+          "xmlTags": [
+            "AlcVolumeMin",
+            "AlcVolumeMax"
+          ],
+          "criteria": "Крепость 37,5–56,0 % об. (допуск ±0,3%). ГОСТ 12712-2013 табл. 2"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки водки",
+          "xmlTags": [
+            "PurificationLevel"
+          ],
+          "criteria": "Указание сорта спирта (Люкс/Экстра/Альфа/Высшая/Первая) совпадает с XML и нормами по альдегидам/щелочности. ГОСТ 12712-2013"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки водки",
+          "xmlTags": [
+            "WaterCorrectionMethod"
+          ],
+          "criteria": "Указание на воду исправленную/подготовленную по ГОСТ 5962"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки водки",
+          "xmlTags": [
+            "NameAP",
+            "DistinctiveCharacteristics"
+          ],
+          "criteria": "**Запрет лишнего**: запрещены указания на «лечебную», «диетическую» водку; запрещено указание возраста выдержки; запрет недостоверных сведений о степени очистки. ТР ТС 022/2011 ст. 4 п. 7; ГОСТ 12712-2013 п. 4.4"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnologicalInstruction",
+          "documentDescription": "PDF с описанием производства водки",
+          "xmlTags": [
+            "TINumber",
+            "TIDate",
+            "TIName"
+          ],
+          "criteria": "Совпадение реквизитов с XML"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnologicalInstruction",
+          "documentDescription": "PDF с описанием производства водки",
+          "xmlTags": [
+            "CompositionProducts"
+          ],
+          "criteria": "Описание подготовки воды, смешивания со спиртом, фильтрации, корректировки. Соответствие категории спирта нормам ГОСТ 12712-2013"
+        }
+      ]
+    },
+    {
+      "productTypeGroup": "Пиво и пивные напитки",
+      "checks": [
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки пива/пивного напитка",
+          "xmlTags": [
+            "BeerType",
+            "ProcessingMethod"
+          ],
+          "criteria": "Указание фильтрации и пастеризации (фильтр./нефильтр., пастеризов./непастеризов.) на этикетке совпадает с XML. ГОСТ Р 58010-2017"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки пива/пивного напитка",
+          "xmlTags": [
+            "OriginalWortExtract"
+          ],
+          "criteria": "Массовая доля начального сусла и крепость в заявленном диапазоне. ГОСТ Р 58010-2017"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки пива/пивного напитка",
+          "xmlTags": [
+            "RawMaterials"
+          ],
+          "criteria": "Состав сырья указан по убыванию долей. ТР ТС 022/2011 ст. 4"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки пива/пивного напитка",
+          "xmlTags": [
+            "NameAP",
+            "DistinctiveCharacteristics"
+          ],
+          "criteria": "**Запрет лишнего**: запрещены медицинские рекомендации, указания на тонизирующие свойства (если не соответствует ГОСТ Р 52845-2007), термины «безалкогольное» при крепости >0,5%; запрет недостоверных данных о солоде/хмеле. ТР ТС 022/2011 ст. 4 п. 7; ГОСТ Р 58010-2017 п. 4.4"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием производства пива",
+          "xmlTags": [
+            "TDNumber",
+            "TINumber",
+            "TDDate",
+            "TIDate"
+          ],
+          "criteria": "Совпадение реквизитов с XML"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием производства пива",
+          "xmlTags": [
+            "CompositionProducts"
+          ],
+          "criteria": "Описание затирания, кипячения сусла, брожения, дображивания. Соответствие экстрактивности, крепости, ферментов/добавок ТР ТС 029/2012"
+        }
+      ]
+    },
+    {
+      "productTypeGroup": "Сидр, пуаре, медовуха",
+      "checks": [
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки",
+          "xmlTags": [
+            "BaseRawMaterial",
+            "FermentationType"
+          ],
+          "criteria": "Сырьевая база соответствует наименованию (яблочный/грушевый сок или мёд+вода+дрожжи). ГОСТ 31820-2015; ГОСТ Р 58011-2017; ГОСТ Р 57594-2017"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки",
+          "xmlTags": [
+            "SugarContent",
+            "Additives"
+          ],
+          "criteria": "Тип брожения, сахар, добавки (E220, кислоты) указаны по ТР ТС 029/2012"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки",
+          "xmlTags": [
+            "NameAP",
+            "DistinctiveCharacteristics"
+          ],
+          "criteria": "**Запрет лишнего**: запрет указаний на «винный» или «пиво» характер, если продукт не соответствует ГОСТ; запрет лечебных указаний; запрет недостоверных данных о происхождении мёда/фруктов. ТР ТС 022/2011 ст. 4 п. 7; ГОСТ 31820-2015 п. 4.4"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием производства",
+          "xmlTags": [
+            "TDNumber",
+            "TINumber",
+            "TDDate",
+            "TIDate"
+          ],
+          "criteria": "Совпадение реквизитов с XML"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с описанием производства",
+          "xmlTags": [
+            "CompositionProducts"
+          ],
+          "criteria": "Описание подготовки сока/сусла, брожения, осветления, розлива. Соответствие физико-химических показателей нормам профильных ГОСТ"
+        }
+      ]
+    },
+    {
+      "productTypeGroup": "Ликеро-водочные изделия",
+      "checks": [
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки ЛВИ",
+          "xmlTags": [
+            "SugarContent",
+            "AlcVolume"
+          ],
+          "criteria": "Классификация по крепости и сахару (наливки, настойки горькие/полусладкие/сладкие, ликеры, бальзамы, пунши) совпадает с XML. ГОСТ 7190-2013; ГОСТ 32071-2013"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки ЛВИ",
+          "xmlTags": [
+            "FlavoringIngredients",
+            "Additives"
+          ],
+          "criteria": "Состав: спиртованная вода, настои/экстракты, сиропы, мёд, ароматизаторы. Добавки с E-кодами по ТР ТС 029/2012"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "LabelFoto",
+          "documentDescription": "Макет этикетки ЛВИ",
+          "xmlTags": [
+            "NameAP",
+            "DistinctiveCharacteristics"
+          ],
+          "criteria": "**Запрет лишнего**: запрет указаний на «лекарственный» характер; запрет недостоверных сведений о растительном сырье; превышения заявленных норм сахара/спирта; запрет использования термина «бальзам» без соответствия ГОСТ 7190-2013. ТР ТС 022/2011 ст. 4 п. 7; ГОСТ 7190-2013 п. 4.4"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с рецептурой и техпроцессом",
+          "xmlTags": [
+            "TDNumber",
+            "TINumber",
+            "TDDate",
+            "TIDate"
+          ],
+          "criteria": "Совпадение реквизитов с XML"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "TechnicalDocumentation",
+          "documentDescription": "PDF с рецептурой и техпроцессом",
+          "xmlTags": [
+            "CompositionProducts"
+          ],
+          "criteria": "Описание приготовления настоев/сиропов, купажа, коррекции, фильтрации. Соответствие рецептурных доз, сахара, спирта, красителей нормам ГОСТ 7190-2013 и ТР ТС 029/2012"
+        }
+      ]
+    },
+    {
+      "productTypeGroup": "Все категории",
+      "checks": [
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "DeclarationCertificate",
+          "documentDescription": "PDF-копия декларации ЕАЭС",
+          "xmlTags": [
+            "DeclarationNumber"
+          ],
+          "criteria": "Формат номера: `ЕАЭС N RU Д-XX.XX.XXXXX/YY` (ТР ЕАЭС 047/2018, ст. 5)"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "DeclarationCertificate",
+          "documentDescription": "PDF-копия декларации ЕАЭС",
+          "xmlTags": [
+            "DateValidity"
+          ],
+          "criteria": "Дата регистрации в формате `YYYY-MM-DD`, должна быть ≤ `DocDate` из XML (Формат обмена ЕГАИС, табл. 3.12)"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "DeclarationCertificate",
+          "documentDescription": "PDF-копия декларации ЕАЭС",
+          "xmlTags": [
+            "DateExpiration"
+          ],
+          "criteria": "Дата окончания действия в формате `YYYY-MM-DD`, должна быть ≥ `DateFirstDelivery` из XML (ТР ТС 021/2011, ст. 23)"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "DeclarationCertificate",
+          "documentDescription": "PDF-копия декларации ЕАЭС",
+          "xmlTags": [
+            "Applicant (извлекается из PDF)"
+          ],
+          "criteria": "Наименование заявителя должно совпадать с `Notifier/UL/FullName` или `Notifier/UL/INN` из XML (Формат обмена ЕГАИС, табл. 3.12)"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "DeclarationCertificate",
+          "documentDescription": "PDF-копия декларации ЕАЭС",
+          "xmlTags": [
+            "Manufacturer (извлекается из PDF)"
+          ],
+          "criteria": "Наименование изготовителя должно совпадать с `Producer/FullName` или `CountryOrigin` из XML (Формат обмена ЕГАИС, табл. 3.2.1)"
+        },
+        {
+          "origin": "РФ/Импорт",
+          "documentType": "DeclarationCertificate",
+          "documentDescription": "PDF-копия декларации ЕАЭС",
+          "xmlTags": [
+            "Область применения (текст декларации)"
+          ],
+          "criteria": "Должна включать код ОКПД2 или ТН ВЭД, указанные в XML `CodOKPD2`/`CodTNVED` (ТР ЕАЭС 047/2018, прил. 1)"
+        }
+      ]
+    }
+  ]
+}
