@@ -119,6 +119,12 @@ def _parse_label_values(raw_response: str) -> Any:
         return None
 
 
+def _ollama_response_without_context(ollama_response: dict[str, Any]) -> dict[str, Any]:
+    cleaned_response = dict(ollama_response)
+    cleaned_response.pop("context", None)
+    return cleaned_response
+
+
 def extract_label_values(
     label_pdf_paths: list[Path],
     extracted_values: dict[str, Any],
@@ -171,7 +177,7 @@ def extract_label_values(
                 "requiredFields": _required_label_fields(extracted_values),
                 "labelValues": _parse_label_values(raw_response),
                 "rawResponse": raw_response,
-                "ollamaResponse": ollama_response,
+                "ollamaResponse": _ollama_response_without_context(ollama_response),
             }
         except EmptyOllamaResponseError as exc:
             result = {
@@ -186,7 +192,7 @@ def extract_label_values(
                 "promptFile": str(prompt_path),
                 "labelPdfFiles": [str(path) for path in label_pdf_paths],
                 "requiredFields": _required_label_fields(extracted_values),
-                "ollamaResponse": exc.ollama_response,
+                "ollamaResponse": _ollama_response_without_context(exc.ollama_response),
             }
         except Exception as exc:
             result = {
