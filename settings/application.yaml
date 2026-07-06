@@ -3,3 +3,6 @@ logging:
   uvicorn: INFO
   uvicorn_access: INFO
   uvicorn_error: INFO
+
+kafka:
+  documents_home_dir: ./documents

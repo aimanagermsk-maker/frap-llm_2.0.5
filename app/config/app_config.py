@@ -30,7 +30,7 @@ class KafkaConfig(BaseModel):
     output_topic: str = "frap-llm-helper-out"
     group_id: str = "frap-llm-helper-reader"
     output_dir: str = "received_messages"
-    files_root: str = "."
+    documents_home_dir: str = "."
     send_json: str | None = None
     send_json_file: str | None = None
 

@@ -58,7 +58,7 @@ class KafkaWorker:
             output_topic=self._config.output_topic,
             group_id=self._config.group_id,
             output_dir=self._config.output_dir,
-            files_root=self._config.files_root,
+            documents_home_dir=self._config.documents_home_dir,
             send_json=self._config.send_json,
             send_json_file=self._config.send_json_file,
         )
@@ -105,7 +105,7 @@ class KafkaWorker:
 
         related_file_path, related_file_content = read_related_file(
             incoming_json,
-            args.files_root,
+            args.documents_home_dir,
         )
         logger.info(
             "Related XML file loaded: %s (%s bytes)",

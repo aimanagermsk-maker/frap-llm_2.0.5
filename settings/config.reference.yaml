@@ -15,7 +15,7 @@ kafka:
   output_topic: frap-llm-helper-out
   group_id: frap-llm-helper-reader
   output_dir: received_messages
-  files_root: .
+  documents_home_dir: ./documents
   send_json:
   send_json_file:
 

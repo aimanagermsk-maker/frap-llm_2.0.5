@@ -19,7 +19,7 @@ DEFAULT_INPUT_TOPIC = "frap-llm-helper-in"
 DEFAULT_OUTPUT_TOPIC = "frap-llm-helper-out"
 DEFAULT_GROUP_ID = "frap-llm-helper-reader"
 DEFAULT_SEND_JSON_FILE = "testFrapLLM.json"
-DEFAULT_FILES_ROOT = "."
+DEFAULT_DOCUMENTS_HOME_DIR = "."
 
 
 def parse_args() -> argparse.Namespace:
@@ -56,9 +56,12 @@ def parse_args() -> argparse.Namespace:
         help="Папка для сохранения входящего JSON.",
     )
     parser.add_argument(
-        "--files-root",
-        default=os.getenv("KAFKA_FILES_ROOT", DEFAULT_FILES_ROOT),
-        help="Корневая папка для поиска файла по пути date/type/uri.",
+        "--documents-home-dir",
+        default=os.getenv(
+            "KAFKA_DOCUMENTS_HOME_DIR",
+            os.getenv("KAFKA_FILES_ROOT", DEFAULT_DOCUMENTS_HOME_DIR),
+        ),
+        help="Домашняя папка документов, внутри которой файл ищется по пути date/type/uri.",
     )
     parser.add_argument(
         "--send-json",
@@ -128,7 +131,7 @@ def validate_path_part(field_name: str, value: Any) -> str:
     return value
 
 
-def get_related_file_path(data: Any, files_root: str) -> Path:
+def get_related_file_path(data: Any, documents_home_dir: str) -> Path:
     if not isinstance(data, dict):
         raise ValueError("Входящий JSON должен быть объектом с полями type, date и uri")
 
@@ -136,11 +139,11 @@ def get_related_file_path(data: Any, files_root: str) -> Path:
     type_ = validate_path_part("type", data.get("type"))
     uri = validate_path_part("uri", data.get("uri"))
 
-    return Path(files_root) / date / type_ / uri
+    return Path(documents_home_dir) / date / type_ / uri
 
 
-def read_related_file(data: Any, files_root: str) -> tuple[Path, bytes]:
-    file_path = get_related_file_path(data, files_root)
+def read_related_file(data: Any, documents_home_dir: str) -> tuple[Path, bytes]:
+    file_path = get_related_file_path(data, documents_home_dir)
     if not file_path.is_file():
         raise FileNotFoundError(f"Файл из входящего JSON не найден: {file_path}")
 
@@ -344,7 +347,7 @@ def main() -> int:
 
         related_file_path, related_file_content = read_related_file(
             incoming_json,
-            args.files_root,
+            args.documents_home_dir,
         )
         print(
             f"Связанный файл получен: {related_file_path} "
