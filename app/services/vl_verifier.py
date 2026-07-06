@@ -9,25 +9,12 @@ import requests
 from app.config.app_config import VisionLanguageConfig
 
 LABEL_DOCUMENT_TYPE = "LabelFoto"
-VERDICT_MATCH = "MATCH"
-VERDICT_MISMATCH = "MISMATCH"
-VERDICT_UNKNOWN = "UNKNOWN"
-VERDICT_ERROR = "ERROR"
 
 
 class EmptyOllamaResponseError(RuntimeError):
     def __init__(self, ollama_response: dict[str, Any]) -> None:
         super().__init__("Ollama returned an empty response field")
         self.ollama_response = ollama_response
-
-
-def _verdict_text(verdict: str) -> str:
-    return {
-        VERDICT_MATCH: "совпадает",
-        VERDICT_MISMATCH: "не совпадает",
-        VERDICT_UNKNOWN: "не удалось определить",
-        VERDICT_ERROR: "ошибка проверки",
-    }.get(verdict, "не удалось определить")
 
 
 def _pdf_page_to_base64(pdf_path: Path, page_num: int) -> str:
@@ -56,6 +43,22 @@ def _label_checks(extracted_values: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
+def _required_label_fields(extracted_values: dict[str, Any]) -> list[dict[str, Any]]:
+    fields: list[dict[str, Any]] = []
+    for check in _label_checks(extracted_values):
+        for tag_name in check.get("xmlTags", []):
+            if not isinstance(tag_name, str):
+                continue
+            fields.append(
+                {
+                    "field": tag_name,
+                    "documentDescription": check.get("documentDescription"),
+                    "criteria": check.get("criteria"),
+                }
+            )
+    return fields
+
+
 def _build_prompt(extracted_values: dict[str, Any]) -> str:
     payload = {
         "ticket": {
@@ -65,20 +68,19 @@ def _build_prompt(extracted_values: dict[str, Any]) -> str:
             "uri": extracted_values.get("uri"),
             "productTypeGroup": extracted_values.get("productTypeGroup"),
         },
-        "labelChecks": _label_checks(extracted_values),
+        "requiredLabelFields": _required_label_fields(extracted_values),
     }
 
     return (
-        "Ты проверяешь макеты этикеток алкогольной продукции. "
         "На изображениях перед тобой страницы PDF из XML-тегов LabelFoto. "
-        "Сравни информацию на этикетке/этикетках с XML-значениями ниже. "
-        "Проверяй только пункты labelChecks: их xmlTags, values и criteria. "
+        "Твоя задача: только извлечь значения требуемых полей с этикетки или этикеток. "
+        "Не сравнивай с XML, не делай финальный вердикт, не оценивай корректность. "
+        "Если поле на этикетке не найдено, верни null для value и кратко укажи evidence. "
         "Верни строго JSON без markdown в формате: "
-        '{"verdict":"MATCH|MISMATCH","summary":"краткий вывод",'
-        '"mismatches":[{"field":"...","labelValue":"...","xmlValue":"...","reason":"..."}]}. '
-        "Если все проверяемые сведения совпадают, verdict должен быть MATCH. "
-        "Если есть хотя бы одно значимое расхождение, verdict должен быть MISMATCH.\n\n"
-        f"XML_VALUES:\n{json.dumps(payload, ensure_ascii=False, indent=2)}"
+        '{"fields":[{"field":"...","value":"...","evidence":"...","confidence":0.0}]}. '
+        "confidence должен быть числом от 0 до 1. "
+        "Извлекай только поля из requiredLabelFields.\n\n"
+        f"PAYLOAD:\n{json.dumps(payload, ensure_ascii=False, indent=2)}"
     )
 
 
@@ -110,49 +112,37 @@ def _send_to_ollama(
     return ollama_response
 
 
-def _extract_verdict(raw_response: str) -> str:
+def _parse_label_values(raw_response: str) -> Any:
     try:
-        parsed = json.loads(raw_response)
+        return json.loads(raw_response)
     except json.JSONDecodeError:
-        upper_response = raw_response.upper()
-        if VERDICT_MISMATCH in upper_response:
-            return VERDICT_MISMATCH
-        if VERDICT_MATCH in upper_response:
-            return VERDICT_MATCH
-        return VERDICT_UNKNOWN
-
-    verdict = parsed.get("verdict")
-    if isinstance(verdict, str) and verdict.upper() in {VERDICT_MATCH, VERDICT_MISMATCH}:
-        return verdict.upper()
-    return VERDICT_UNKNOWN
+        return None
 
 
-def verify_label_pdfs(
+def extract_label_values(
     label_pdf_paths: list[Path],
     extracted_values: dict[str, Any],
     ticket_dir: Path,
     config: VisionLanguageConfig,
 ) -> Path:
-    verdict_path = ticket_dir / "llm_verdict.json"
-    verdict_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path = ticket_dir / "llm_label_values.json"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
 
     if not config.enabled:
-        verdict = {
+        result = {
             "ticketId": ticket_dir.name,
-            "verdict": VERDICT_UNKNOWN,
-            "verdictText": _verdict_text(VERDICT_UNKNOWN),
             "status": "SKIPPED",
-            "reason": "VL verification is disabled",
+            "reason": "VL extraction is disabled",
             "labelPdfFiles": [str(path) for path in label_pdf_paths],
+            "requiredFields": _required_label_fields(extracted_values),
         }
     elif not label_pdf_paths:
-        verdict = {
+        result = {
             "ticketId": ticket_dir.name,
-            "verdict": VERDICT_UNKNOWN,
-            "verdictText": _verdict_text(VERDICT_UNKNOWN),
             "status": "SKIPPED",
             "reason": "No LabelFoto PDF files found",
             "labelPdfFiles": [],
+            "requiredFields": _required_label_fields(extracted_values),
         }
     else:
         prompt = _build_prompt(extracted_values)
@@ -165,11 +155,8 @@ def verify_label_pdfs(
 
             ollama_response = _send_to_ollama(images_b64, prompt, config)
             raw_response = ollama_response["response"]
-            parsed_verdict = _extract_verdict(raw_response)
-            verdict = {
+            result = {
                 "ticketId": ticket_dir.name,
-                "verdict": parsed_verdict,
-                "verdictText": _verdict_text(parsed_verdict),
                 "status": "OK",
                 "model": config.model,
                 "url": config.url,
@@ -177,15 +164,14 @@ def verify_label_pdfs(
                 "imageCount": len(images_b64),
                 "promptFile": str(prompt_path),
                 "labelPdfFiles": [str(path) for path in label_pdf_paths],
-                "checkedFields": _label_checks(extracted_values),
+                "requiredFields": _required_label_fields(extracted_values),
+                "labelValues": _parse_label_values(raw_response),
                 "rawResponse": raw_response,
                 "ollamaResponse": ollama_response,
             }
         except EmptyOllamaResponseError as exc:
-            verdict = {
+            result = {
                 "ticketId": ticket_dir.name,
-                "verdict": VERDICT_ERROR,
-                "verdictText": _verdict_text(VERDICT_ERROR),
                 "status": "ERROR",
                 "errorType": "EMPTY_OLLAMA_RESPONSE",
                 "error": str(exc),
@@ -194,14 +180,12 @@ def verify_label_pdfs(
                 "jsonMode": config.json_mode,
                 "promptFile": str(prompt_path),
                 "labelPdfFiles": [str(path) for path in label_pdf_paths],
-                "checkedFields": _label_checks(extracted_values),
+                "requiredFields": _required_label_fields(extracted_values),
                 "ollamaResponse": exc.ollama_response,
             }
         except Exception as exc:
-            verdict = {
+            result = {
                 "ticketId": ticket_dir.name,
-                "verdict": VERDICT_ERROR,
-                "verdictText": _verdict_text(VERDICT_ERROR),
                 "status": "ERROR",
                 "errorType": type(exc).__name__,
                 "error": str(exc),
@@ -210,11 +194,11 @@ def verify_label_pdfs(
                 "jsonMode": config.json_mode,
                 "promptFile": str(prompt_path),
                 "labelPdfFiles": [str(path) for path in label_pdf_paths],
-                "checkedFields": _label_checks(extracted_values),
+                "requiredFields": _required_label_fields(extracted_values),
             }
 
-    verdict_path.write_text(
-        json.dumps(verdict, ensure_ascii=False, indent=2),
+    output_path.write_text(
+        json.dumps(result, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    return verdict_path
+    return output_path
