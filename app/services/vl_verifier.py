@@ -122,6 +122,7 @@ def _parse_label_values(raw_response: str) -> Any:
 def extract_label_values(
     label_pdf_paths: list[Path],
     extracted_values: dict[str, Any],
+    header: dict[str, Any],
     ticket_dir: Path,
     config: VisionLanguageConfig,
 ) -> Path:
@@ -131,6 +132,7 @@ def extract_label_values(
     if not config.enabled:
         result = {
             "ticketId": ticket_dir.name,
+            "header": header,
             "status": "SKIPPED",
             "reason": "VL extraction is disabled",
             "labelPdfFiles": [str(path) for path in label_pdf_paths],
@@ -139,6 +141,7 @@ def extract_label_values(
     elif not label_pdf_paths:
         result = {
             "ticketId": ticket_dir.name,
+            "header": header,
             "status": "SKIPPED",
             "reason": "No LabelFoto PDF files found",
             "labelPdfFiles": [],
@@ -157,6 +160,7 @@ def extract_label_values(
             raw_response = ollama_response["response"]
             result = {
                 "ticketId": ticket_dir.name,
+                "header": header,
                 "status": "OK",
                 "model": config.model,
                 "url": config.url,
@@ -172,6 +176,7 @@ def extract_label_values(
         except EmptyOllamaResponseError as exc:
             result = {
                 "ticketId": ticket_dir.name,
+                "header": header,
                 "status": "ERROR",
                 "errorType": "EMPTY_OLLAMA_RESPONSE",
                 "error": str(exc),
@@ -186,6 +191,7 @@ def extract_label_values(
         except Exception as exc:
             result = {
                 "ticketId": ticket_dir.name,
+                "header": header,
                 "status": "ERROR",
                 "errorType": type(exc).__name__,
                 "error": str(exc),

@@ -19,6 +19,7 @@ from app.kafka_test import (
     validate_pdf_hashes,
 )
 from app.services.xml_value_extractor import save_extracted_values
+from app.services.ticket_header import build_ticket_header
 from app.services.vl_verifier import extract_label_values
 
 logger = logging.getLogger(__name__)
@@ -42,9 +43,10 @@ class KafkaWorker:
         )
         self._thread.start()
         logger.info(
-            "Kafka worker started: bootstrap=%s input_topic=%s group_id=%s",
+            "Kafka worker started: bootstrap=%s input_topic=%s output_topic=%s group_id=%s",
             self._config.bootstrap_servers,
             self._config.input_topic,
+            self._config.output_topic,
             self._config.group_id,
         )
 
@@ -121,6 +123,7 @@ class KafkaWorker:
             related_file_path,
             len(related_file_content),
         )
+        ticket_header = build_ticket_header(incoming_json, related_file_content)
 
         validate_pdf_hashes(incoming_json, related_file_content)
         saved_pdf_paths = save_extracted_pdfs(
@@ -146,10 +149,19 @@ class KafkaWorker:
         label_values_path = extract_label_values(
             label_pdf_paths=label_pdf_paths,
             extracted_values=extracted_values,
+            header=ticket_header,
             ticket_dir=ticket_dir,
             config=self._vl_config,
         )
         logger.info("LLM-VL label values saved: %s", label_values_path)
+
+        label_values_json = json.loads(label_values_path.read_text(encoding="utf-8"))
+        send_json(args, label_values_json)
+        logger.info(
+            "LLM-VL label values sent to Kafka topic %s: %s",
+            args.output_topic,
+            label_values_path,
+        )
 
         outgoing_json = self._get_optional_json_to_send(args)
         if outgoing_json is not None:
