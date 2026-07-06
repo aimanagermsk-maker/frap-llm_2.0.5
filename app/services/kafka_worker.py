@@ -1,12 +1,14 @@
 import json
 import logging
 import threading
+import uuid
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
 from confluent_kafka import Consumer, KafkaError
 
-from app.config.app_config import KafkaConfig
+from app.config.app_config import KafkaConfig, VisionLanguageConfig
 from app.kafka_test import (
     kafka_config,
     load_json_from_message,
@@ -17,13 +19,15 @@ from app.kafka_test import (
     validate_pdf_hashes,
 )
 from app.services.xml_value_extractor import save_extracted_values
+from app.services.vl_verifier import verify_label_pdfs
 
 logger = logging.getLogger(__name__)
 
 
 class KafkaWorker:
-    def __init__(self, config: KafkaConfig) -> None:
+    def __init__(self, config: KafkaConfig, vl_config: VisionLanguageConfig) -> None:
         self._config = config
+        self._vl_config = vl_config
         self._stop_event = threading.Event()
         self._thread: threading.Thread | None = None
 
@@ -99,8 +103,13 @@ class KafkaWorker:
             logger.info("Kafka worker stopped")
 
     def _process_message(self, args: SimpleNamespace, raw_value: bytes | str | None) -> None:
+        ticket_id = str(uuid.uuid4())
+        ticket_dir = Path(args.output_dir) / ticket_id
+        ticket_dir.mkdir(parents=True, exist_ok=True)
+        logger.info("Kafka ticket workspace created: %s", ticket_dir)
+
         incoming_json = load_json_from_message(raw_value)
-        saved_path = save_json_to_disk(incoming_json, args.output_dir)
+        saved_path = save_json_to_disk(incoming_json, str(ticket_dir))
         logger.info("Incoming Kafka JSON saved: %s", saved_path)
 
         related_file_path, related_file_content = read_related_file(
@@ -116,7 +125,7 @@ class KafkaWorker:
         validate_pdf_hashes(incoming_json, related_file_content)
         saved_pdf_paths = save_extracted_pdfs(
             related_file_content,
-            args.output_dir,
+            str(ticket_dir),
             related_file_path.stem,
         )
         for pdf_path in saved_pdf_paths:
@@ -125,10 +134,22 @@ class KafkaWorker:
         extracted_values_path = save_extracted_values(
             incoming_json,
             related_file_content,
-            args.output_dir,
+            str(ticket_dir),
             related_file_path.stem,
         )
         logger.info("XML values saved: %s", extracted_values_path)
+
+        extracted_values = json.loads(extracted_values_path.read_text(encoding="utf-8"))
+        label_pdf_paths = [
+            path for path in saved_pdf_paths if "_LabelFoto_" in path.name
+        ]
+        verdict_path = verify_label_pdfs(
+            label_pdf_paths=label_pdf_paths,
+            extracted_values=extracted_values,
+            ticket_dir=ticket_dir,
+            config=self._vl_config,
+        )
+        logger.info("LLM-VL verdict saved: %s", verdict_path)
 
         outgoing_json = self._get_optional_json_to_send(args)
         if outgoing_json is not None:

@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
     log_app_config()
     kafka_worker = None
     if config.kafka.enabled:
-        kafka_worker = KafkaWorker(config.kafka)
+        kafka_worker = KafkaWorker(config.kafka, config.vl)
         kafka_worker.start()
         app.state.kafka_worker = kafka_worker
 

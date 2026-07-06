@@ -1,3 +1,9 @@
 kafka:
   documents_home_dir: /home/ubuntu/Kafka/test
   output_dir: /home/ubuntu/Kafka/received_messages
+
+vl:
+  enabled: true
+  url: http://95.182.74.35:34892/api/generate
+  model: qwen3-vl:32b
+  timeout_seconds: 300

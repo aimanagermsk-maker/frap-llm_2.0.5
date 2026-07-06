@@ -36,6 +36,13 @@ class KafkaConfig(BaseModel):
     send_json_file: str | None = None
 
 
+class VisionLanguageConfig(BaseModel):
+    enabled: bool = True
+    url: str = "http://95.182.74.35:34892/api/generate"
+    model: str = "qwen3-vl:32b"
+    timeout_seconds: float = 300.0
+
+
 class AppConfig(BaseModel):
     """Итоговый конфиг приложения после слияния yaml-файлов и environment."""
     contour: str = "sandbox"
@@ -43,6 +50,7 @@ class AppConfig(BaseModel):
     database: DatabaseConfig
     logging: LoggingConfig
     kafka: KafkaConfig = Field(default_factory=KafkaConfig)
+    vl: VisionLanguageConfig = Field(default_factory=VisionLanguageConfig)
 
 
 def _profile_config_path(profile: str) -> os.PathLike[str]:

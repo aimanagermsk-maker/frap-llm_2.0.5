@@ -19,6 +19,12 @@ kafka:
   send_json:
   send_json_file:
 
+vl:
+  enabled: true
+  url: http://95.182.74.35:34892/api/generate
+  model: qwen3-vl:32b
+  timeout_seconds: 300
+
 # Вариант 1: отдельные поля
 database:
   url: jdbc:postgresql://89.108.103.170:5432
