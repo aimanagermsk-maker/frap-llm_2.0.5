@@ -18,6 +18,7 @@
 
 Другие профили — [`settings/application-{profile}.yaml`](settings/) (`application-test.yaml`, `application-prod.yaml` и т.д.).
 Справочник всех полей: [`settings/config.reference.yaml`](settings/config.reference.yaml).
+User settings: [`settings/user_settings.yaml`](settings/user_settings.yaml).
 
 
 

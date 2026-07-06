@@ -18,6 +18,7 @@ if ENV_LOCAL and ENV_LOCAL.exists():
 logger = logging.getLogger(__name__)
 
 BASE_CONFIG_PATH = SETTINGS_DIR / "application.yaml"
+USER_SETTINGS_CONFIG_PATH = SETTINGS_DIR / "user_settings.yaml"
 ACTIVE_PROFILE_PROPERTY = "python.profiles.active"
 ACTIVE_PROFILE_ENV = "PYTHON_PROFILES_ACTIVE"
 DEFAULT_PROFILE = "sandbox"
@@ -59,6 +60,8 @@ def _load_yaml(path: os.PathLike[str] | str) -> dict[str, Any]:
     """Читает yaml-файл в словарь."""
     with open(path, encoding="utf-8") as config_file:
         data = yaml.safe_load(config_file)
+    if data is None:
+        return {}
     if not isinstance(data, dict):
         raise ValueError(f"Invalid config format: {path}")
     return data
@@ -159,6 +162,8 @@ def _load_merged_config(profile: str) -> dict[str, Any]:
 
     merged = _load_yaml(BASE_CONFIG_PATH)
     merged = _deep_merge(merged, _load_yaml(profile_path))
+    if USER_SETTINGS_CONFIG_PATH.is_file():
+        merged = _deep_merge(merged, _load_yaml(USER_SETTINGS_CONFIG_PATH))
     merged = _deep_merge(merged, _load_env_overrides(merged))
     merged["contour"] = profile
     return merged

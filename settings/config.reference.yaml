@@ -1,4 +1,4 @@
-# Справочник полей для application.yaml + application-{profile}.yaml
+# Справочник полей для application.yaml + application-{profile}.yaml + user_settings.yaml
 
 contour: sandbox
 

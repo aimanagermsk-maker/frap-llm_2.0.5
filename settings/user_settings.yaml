@@ -1,0 +1,2 @@
+kafka:
+  documents_home_dir: ./documents

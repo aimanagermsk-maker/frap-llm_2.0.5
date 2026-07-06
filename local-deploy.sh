@@ -26,11 +26,8 @@ read_kafka_documents_home_dir() {
 }
 
 DOCUMENTS_HOME_DIR="$(
-  read_kafka_documents_home_dir "$SCRIPT_DIR/settings/application-${PYTHON_PROFILE}.yaml"
+  read_kafka_documents_home_dir "$SCRIPT_DIR/settings/user_settings.yaml"
 )"
-if [[ -z "$DOCUMENTS_HOME_DIR" ]]; then
-  DOCUMENTS_HOME_DIR="$(read_kafka_documents_home_dir "$SCRIPT_DIR/settings/application.yaml")"
-fi
 
 DOCKER_VOLUME_ARGS=()
 if [[ -n "$DOCUMENTS_HOME_DIR" ]]; then
