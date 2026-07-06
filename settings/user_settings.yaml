@@ -4,6 +4,7 @@ kafka:
 
 vl:
   enabled: true
-  url: http://95.182.74.35:34892/api/generate
-  model: qwen3-vl:32b
+  url: http://195.209.210.141:11434/api/generate
+  model: qwen3-vl:30b
   timeout_seconds: 300
+  json_mode: true

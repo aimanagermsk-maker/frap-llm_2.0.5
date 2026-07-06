@@ -38,9 +38,10 @@ class KafkaConfig(BaseModel):
 
 class VisionLanguageConfig(BaseModel):
     enabled: bool = True
-    url: str = "http://95.182.74.35:34892/api/generate"
-    model: str = "qwen3-vl:32b"
+    url: str = "http://195.209.210.141:11434/api/generate"
+    model: str = "qwen3-vl:30b"
     timeout_seconds: float = 300.0
+    json_mode: bool = True
 
 
 class AppConfig(BaseModel):

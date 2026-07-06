@@ -2,7 +2,7 @@ import fitz  # PyMuPDF
 import base64
 import requests
 
-OLLAMA_URL = "http://95.182.74.35:34892/api/generate"
+OLLAMA_URL = "http://195.209.210.141:11434/api/generate"
 
 def pdf_page_to_base64(pdf_path, page_num):
     """Открывает PDF, конвертирует страницу в base64-encoded PNG."""
@@ -12,7 +12,7 @@ def pdf_page_to_base64(pdf_path, page_num):
     image_bytes = pix.tobytes("png")
     return base64.b64encode(image_bytes).decode('utf-8')
 
-def send_image_to_ollama(image_b64, prompt="Что ты видишь на этом документе?", model="qwen3-vl:32b"):
+def send_image_to_ollama(image_b64, prompt="Что ты видишь на этом документе?", model="qwen3-vl:30b"):
     headers = {"Content-Type": "application/json"}
     data = {
         "model": model,

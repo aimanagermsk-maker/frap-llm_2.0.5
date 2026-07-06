@@ -15,6 +15,12 @@ VERDICT_UNKNOWN = "UNKNOWN"
 VERDICT_ERROR = "ERROR"
 
 
+class EmptyOllamaResponseError(RuntimeError):
+    def __init__(self, ollama_response: dict[str, Any]) -> None:
+        super().__init__("Ollama returned an empty response field")
+        self.ollama_response = ollama_response
+
+
 def _verdict_text(verdict: str) -> str:
     return {
         VERDICT_MATCH: "совпадает",
@@ -80,20 +86,28 @@ def _send_to_ollama(
     images_b64: list[str],
     prompt: str,
     config: VisionLanguageConfig,
-) -> str:
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "model": config.model,
+        "prompt": prompt,
+        "images": images_b64,
+        "stream": False,
+    }
+    if config.json_mode:
+        payload["format"] = "json"
+
     response = requests.post(
         config.url,
-        json={
-            "model": config.model,
-            "prompt": prompt,
-            "images": images_b64,
-            "stream": False,
-        },
+        json=payload,
         headers={"Content-Type": "application/json"},
         timeout=config.timeout_seconds,
     )
     response.raise_for_status()
-    return response.json().get("response", "")
+    ollama_response = response.json()
+    raw_response = ollama_response.get("response", "")
+    if not isinstance(raw_response, str) or not raw_response.strip():
+        raise EmptyOllamaResponseError(ollama_response)
+    return ollama_response
 
 
 def _extract_verdict(raw_response: str) -> str:
@@ -142,12 +156,15 @@ def verify_label_pdfs(
         }
     else:
         prompt = _build_prompt(extracted_values)
+        prompt_path = ticket_dir / "vl_prompt.txt"
+        prompt_path.write_text(prompt, encoding="utf-8")
         try:
             images_b64: list[str] = []
             for pdf_path in label_pdf_paths:
                 images_b64.extend(_pdf_to_base64_pages(pdf_path))
 
-            raw_response = _send_to_ollama(images_b64, prompt, config)
+            ollama_response = _send_to_ollama(images_b64, prompt, config)
+            raw_response = ollama_response["response"]
             parsed_verdict = _extract_verdict(raw_response)
             verdict = {
                 "ticketId": ticket_dir.name,
@@ -156,9 +173,29 @@ def verify_label_pdfs(
                 "status": "OK",
                 "model": config.model,
                 "url": config.url,
+                "jsonMode": config.json_mode,
+                "imageCount": len(images_b64),
+                "promptFile": str(prompt_path),
                 "labelPdfFiles": [str(path) for path in label_pdf_paths],
                 "checkedFields": _label_checks(extracted_values),
                 "rawResponse": raw_response,
+                "ollamaResponse": ollama_response,
+            }
+        except EmptyOllamaResponseError as exc:
+            verdict = {
+                "ticketId": ticket_dir.name,
+                "verdict": VERDICT_ERROR,
+                "verdictText": _verdict_text(VERDICT_ERROR),
+                "status": "ERROR",
+                "errorType": "EMPTY_OLLAMA_RESPONSE",
+                "error": str(exc),
+                "model": config.model,
+                "url": config.url,
+                "jsonMode": config.json_mode,
+                "promptFile": str(prompt_path),
+                "labelPdfFiles": [str(path) for path in label_pdf_paths],
+                "checkedFields": _label_checks(extracted_values),
+                "ollamaResponse": exc.ollama_response,
             }
         except Exception as exc:
             verdict = {
@@ -166,9 +203,12 @@ def verify_label_pdfs(
                 "verdict": VERDICT_ERROR,
                 "verdictText": _verdict_text(VERDICT_ERROR),
                 "status": "ERROR",
+                "errorType": type(exc).__name__,
                 "error": str(exc),
                 "model": config.model,
                 "url": config.url,
+                "jsonMode": config.json_mode,
+                "promptFile": str(prompt_path),
                 "labelPdfFiles": [str(path) for path in label_pdf_paths],
                 "checkedFields": _label_checks(extracted_values),
             }
