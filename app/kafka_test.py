@@ -61,12 +61,6 @@ def parse_args() -> argparse.Namespace:
         help="Корневая папка для поиска файла по пути date/type/uri.",
     )
     parser.add_argument(
-        "--timeout",
-        type=float,
-        default=float(os.getenv("KAFKA_POLL_TIMEOUT", "30")),
-        help="Сколько секунд ждать входящее сообщение.",
-    )
-    parser.add_argument(
         "--send-json",
         default=os.getenv("KAFKA_SEND_JSON"),
         help='JSON-строка для отправки, например: {"status":"ok"}',
@@ -276,13 +270,9 @@ def receive_one_json(args: argparse.Namespace) -> tuple[Any, Path]:
 
     try:
         consumer.subscribe([args.input_topic])
-        message = consumer.poll(args.timeout)
-
-        if message is None:
-            raise TimeoutError(
-                f"За {args.timeout} секунд не пришло сообщений из топика "
-                f"{args.input_topic!r}"
-            )
+        message = None
+        while message is None:
+            message = consumer.poll(1.0)
 
         if message.error():
             if message.error().code() == KafkaError._PARTITION_EOF:

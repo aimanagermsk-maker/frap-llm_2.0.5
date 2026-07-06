@@ -6,7 +6,7 @@ from typing import Any
 
 import yaml
 from dotenv import load_dotenv
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.config.database_config import DatabaseConfig
 from app.config.logging_config import LoggingConfig
@@ -23,12 +23,25 @@ ACTIVE_PROFILE_ENV = "PYTHON_PROFILES_ACTIVE"
 DEFAULT_PROFILE = "sandbox"
 
 
+class KafkaConfig(BaseModel):
+    enabled: bool = True
+    bootstrap_servers: str = "gitlab-ci.ru:9092"
+    input_topic: str = "frap-llm-helper-in"
+    output_topic: str = "frap-llm-helper-out"
+    group_id: str = "frap-llm-helper-reader"
+    output_dir: str = "received_messages"
+    files_root: str = "."
+    send_json: str | None = None
+    send_json_file: str | None = None
+
+
 class AppConfig(BaseModel):
     """Итоговый конфиг приложения после слияния yaml-файлов и environment."""
     contour: str = "sandbox"
     description: str = ""
     database: DatabaseConfig
     logging: LoggingConfig
+    kafka: KafkaConfig = Field(default_factory=KafkaConfig)
 
 
 def _profile_config_path(profile: str) -> os.PathLike[str]:

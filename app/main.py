@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from app.config.app_config import get_app_config, log_app_config
 from app.config.logging_config import setup_logging
 from app.routers import hello_router
+from app.services.kafka_worker import KafkaWorker
 
 VERSION = "0.1.0"
 HOST = "0.0.0.0"
@@ -19,7 +20,17 @@ async def lifespan(app: FastAPI):
     config = get_app_config()
     setup_logging(config.logging)
     log_app_config()
-    yield
+    kafka_worker = None
+    if config.kafka.enabled:
+        kafka_worker = KafkaWorker(config.kafka)
+        kafka_worker.start()
+        app.state.kafka_worker = kafka_worker
+
+    try:
+        yield
+    finally:
+        if kafka_worker:
+            kafka_worker.stop()
 
 
 app = FastAPI(

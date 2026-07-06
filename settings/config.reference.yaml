@@ -8,6 +8,17 @@ logging:
   uvicorn_access: INFO
   uvicorn_error: INFO
 
+kafka:
+  enabled: true
+  bootstrap_servers: gitlab-ci.ru:9092
+  input_topic: frap-llm-helper-in
+  output_topic: frap-llm-helper-out
+  group_id: frap-llm-helper-reader
+  output_dir: received_messages
+  files_root: .
+  send_json:
+  send_json_file:
+
 # Вариант 1: отдельные поля
 database:
   url: jdbc:postgresql://89.108.103.170:5432
