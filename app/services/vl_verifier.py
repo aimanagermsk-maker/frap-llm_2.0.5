@@ -5,14 +5,11 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
-import fitz
-import requests
-
 from app.config.app_config import VisionLanguageConfig
-from app.config.paths import ROOT_DIR
+from app.config.paths import PROJECT_ROOT
 
 LLM_REQUEST_FILE_NAME = "llm_request.txt"
-PROMPT_FILE = ROOT_DIR / "PROMPT.txt"
+PROMPT_FILE = PROJECT_ROOT / "PROMPT.txt"
 SECTION_SEPARATOR = "!" * 20
 PDF_XML_TAGS = {"LabelFoto", "TDElectronicView"}
 
@@ -24,6 +21,8 @@ class EmptyOllamaResponseError(RuntimeError):
 
 
 def _pdf_page_to_base64(pdf_path: Path, page_num: int) -> str:
+    import fitz
+
     with fitz.open(pdf_path) as doc:
         page = doc.load_page(page_num)
         pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
@@ -266,6 +265,8 @@ def _send_to_ollama(
     prompt: str,
     config: VisionLanguageConfig,
 ) -> dict[str, Any]:
+    import requests
+
     payload: dict[str, Any] = {
         "model": config.model,
         "prompt": prompt,
