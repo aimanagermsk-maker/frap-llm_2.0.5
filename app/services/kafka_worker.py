@@ -143,12 +143,10 @@ class KafkaWorker:
         logger.info("XML values saved: %s", extracted_values_path)
 
         extracted_values = json.loads(extracted_values_path.read_text(encoding="utf-8"))
-        label_pdf_paths = [
-            path for path in saved_pdf_paths if "_LabelFoto_" in path.name
-        ]
         label_values_path = extract_label_values(
-            label_pdf_paths=label_pdf_paths,
+            label_pdf_paths=saved_pdf_paths,
             extracted_values=extracted_values,
+            incoming_json=incoming_json,
             header=ticket_header,
             ticket_dir=ticket_dir,
             config=self._vl_config,
