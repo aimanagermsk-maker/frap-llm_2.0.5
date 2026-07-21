@@ -9,15 +9,16 @@ APP_PORT=8000
 PYTHON_PROFILE="${PYTHON_PROFILES_ACTIVE:-sandbox}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-read_kafka_setting() {
+read_yaml_section_setting() {
   local config_file="$1"
-  local setting_name="$2"
+  local section_name="$2"
+  local setting_name="$3"
   [[ -f "$config_file" ]] || return 0
 
-  awk -v setting_name="$setting_name" '
-    /^[^[:space:]#][^:]*:/ { in_kafka=0 }
-    /^[[:space:]]*kafka:[[:space:]]*$/ { in_kafka=1; next }
-    in_kafka && $0 ~ "^[[:space:]]*" setting_name ":[[:space:]]*" {
+  awk -v section_name="$section_name" -v setting_name="$setting_name" '
+    /^[^[:space:]#][^:]*:/ { in_section=0 }
+    $0 ~ "^[[:space:]]*" section_name ":[[:space:]]*$" { in_section=1; next }
+    in_section && $0 ~ "^[[:space:]]*" setting_name ":[[:space:]]*" {
       sub("^[[:space:]]*" setting_name ":[[:space:]]*", "")
       gsub(/^[ "\047]+|[ "\047]+$/, "")
       print
@@ -27,10 +28,13 @@ read_kafka_setting() {
 }
 
 DOCUMENTS_HOME_DIR="$(
-  read_kafka_setting "$SCRIPT_DIR/settings/user_settings.yaml" "documents_home_dir"
+  read_yaml_section_setting "$SCRIPT_DIR/settings/user_settings.yaml" "kafka" "documents_home_dir"
 )"
 OUTPUT_DIR="$(
-  read_kafka_setting "$SCRIPT_DIR/settings/user_settings.yaml" "output_dir"
+  read_yaml_section_setting "$SCRIPT_DIR/settings/user_settings.yaml" "kafka" "output_dir"
+)"
+LLM_RESPONSE_TEXT_DIR="$(
+  read_yaml_section_setting "$SCRIPT_DIR/settings/user_settings.yaml" "vl" "response_text_dir"
 )"
 
 resolve_mount_paths() {
@@ -59,6 +63,11 @@ if [[ -n "$OUTPUT_DIR" ]]; then
   mkdir -p "$HOST_OUTPUT_DIR"
   DOCKER_VOLUME_ARGS+=(-v "${HOST_OUTPUT_DIR}:${CONTAINER_OUTPUT_DIR}:rw")
 fi
+if [[ -n "$LLM_RESPONSE_TEXT_DIR" ]]; then
+  resolve_mount_paths "$LLM_RESPONSE_TEXT_DIR" HOST_LLM_RESPONSE_TEXT_DIR CONTAINER_LLM_RESPONSE_TEXT_DIR
+  mkdir -p "$HOST_LLM_RESPONSE_TEXT_DIR"
+  DOCKER_VOLUME_ARGS+=(-v "${HOST_LLM_RESPONSE_TEXT_DIR}:${CONTAINER_LLM_RESPONSE_TEXT_DIR}:rw")
+fi
 
 docker stop "$CONTAINER_NAME" 2>/dev/null || true
 docker rm "$CONTAINER_NAME" 2>/dev/null || true
@@ -80,6 +89,9 @@ if [[ -n "$DOCUMENTS_HOME_DIR" ]]; then
 fi
 if [[ -n "$OUTPUT_DIR" ]]; then
   echo "Output mounted: ${HOST_OUTPUT_DIR} -> ${CONTAINER_OUTPUT_DIR}"
+fi
+if [[ -n "$LLM_RESPONSE_TEXT_DIR" ]]; then
+  echo "LLM response text mounted: ${HOST_LLM_RESPONSE_TEXT_DIR} -> ${CONTAINER_LLM_RESPONSE_TEXT_DIR}"
 fi
 echo "http://localhost:${APP_PORT}/hello"
 echo "http://localhost:${APP_PORT}/docs"

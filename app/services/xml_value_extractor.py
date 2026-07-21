@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from app.services.product_fields import ProductFieldCheck, get_product_fields
+from app.services.ticket_header import TABLE_WINES_PRODUCT_TYPE_GROUP
 
 
 def _local_name(tag: str) -> str:
@@ -72,10 +73,7 @@ def extract_check_values(xml_content: bytes, check: ProductFieldCheck) -> dict[s
 
 
 def build_extracted_values(data: dict[str, Any], xml_content: bytes) -> dict[str, Any]:
-    product_type_group = data.get("productTypeGroup")
-    if not isinstance(product_type_group, str) or not product_type_group:
-        raise ValueError("Во входящем JSON нет productTypeGroup")
-
+    product_type_group = TABLE_WINES_PRODUCT_TYPE_GROUP
     product_fields = get_product_fields(product_type_group)
     checks = []
 

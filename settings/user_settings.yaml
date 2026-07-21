@@ -8,3 +8,4 @@ vl:
   model: qwen3-vl:30b
   timeout_seconds: 300
   json_mode: true
+  response_text_dir: /home/ubuntu/Kafka/llm_responses

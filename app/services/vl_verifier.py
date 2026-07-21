@@ -125,6 +125,14 @@ def _ollama_response_without_context(ollama_response: dict[str, Any]) -> dict[st
     return cleaned_response
 
 
+def _save_raw_response_text(raw_response: str, ticket_id: str, config: VisionLanguageConfig) -> Path:
+    response_text_dir = Path(config.response_text_dir)
+    response_text_dir.mkdir(parents=True, exist_ok=True)
+    response_text_path = response_text_dir / f"{ticket_id}_llm_response.txt"
+    response_text_path.write_text(raw_response, encoding="utf-8")
+    return response_text_path
+
+
 def extract_label_values(
     label_pdf_paths: list[Path],
     extracted_values: dict[str, Any],
@@ -164,6 +172,7 @@ def extract_label_values(
 
             ollama_response = _send_to_ollama(images_b64, prompt, config)
             raw_response = ollama_response["response"]
+            response_text_path = _save_raw_response_text(raw_response, ticket_dir.name, config)
             result = {
                 "ticketId": ticket_dir.name,
                 "header": header,
@@ -173,6 +182,7 @@ def extract_label_values(
                 "jsonMode": config.json_mode,
                 "imageCount": len(images_b64),
                 "promptFile": str(prompt_path),
+                "rawResponseTextFile": str(response_text_path),
                 "labelPdfFiles": [str(path) for path in label_pdf_paths],
                 "requiredFields": _required_label_fields(extracted_values),
                 "labelValues": _parse_label_values(raw_response),

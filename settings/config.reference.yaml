@@ -25,6 +25,7 @@ vl:
   model: qwen3-vl:30b
   timeout_seconds: 300
   json_mode: true
+  response_text_dir: llm_responses
 
 # Вариант 1: отдельные поля
 database:

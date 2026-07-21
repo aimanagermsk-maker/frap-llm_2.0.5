@@ -42,6 +42,7 @@ class VisionLanguageConfig(BaseModel):
     model: str = "qwen3-vl:30b"
     timeout_seconds: float = 300.0
     json_mode: bool = True
+    response_text_dir: str = "llm_responses"
 
 
 class AppConfig(BaseModel):

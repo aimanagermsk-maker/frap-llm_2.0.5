@@ -3,6 +3,8 @@ import hashlib
 import xml.etree.ElementTree as ET
 from typing import Any
 
+TABLE_WINES_PRODUCT_TYPE_GROUP = "\u0412\u0438\u043d\u0430 \u0441\u0442\u043e\u043b\u043e\u0432\u044b\u0435 \u0438 \u0432\u0438\u043d\u043e\u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b\u044b"
+
 
 def _local_name(tag: str) -> str:
     return tag.rsplit("}", 1)[-1]
@@ -81,13 +83,8 @@ def _label_foto_hashes(root: ET.Element) -> list[str]:
 def build_ticket_header(incoming_json: dict[str, Any], xml_content: bytes) -> dict[str, Any]:
     root = ET.fromstring(xml_content)
     vid_ap = _first_text(root, "VidAP")
-    product_type_group = (
-        _product_type_group_from_vid_ap(vid_ap)
-        or incoming_json.get("productTypeGroup")
-    )
     origin = (
-        incoming_json.get("orinal")
-        or incoming_json.get("original")
+        incoming_json.get("original")
         or incoming_json.get("origin")
     )
 
@@ -96,7 +93,7 @@ def build_ticket_header(incoming_json: dict[str, Any], xml_content: bytes) -> di
         "type": incoming_json.get("type"),
         "date": incoming_json.get("date"),
         "uri": incoming_json.get("uri"),
-        "productTypeGroup": product_type_group,
+        "productTypeGroup": TABLE_WINES_PRODUCT_TYPE_GROUP,
         "original": origin,
         "capacityList": [
             {"md5Hash": md5_hash}
