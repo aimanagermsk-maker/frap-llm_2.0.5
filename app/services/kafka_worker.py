@@ -147,6 +147,7 @@ class KafkaWorker:
             label_pdf_paths=saved_pdf_paths,
             extracted_values=extracted_values,
             incoming_json=incoming_json,
+            xml_content=related_file_content,
             header=ticket_header,
             ticket_dir=ticket_dir,
             config=self._vl_config,

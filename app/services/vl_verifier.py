@@ -1,6 +1,7 @@
 import base64
 import json
 import traceback
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
@@ -8,8 +9,12 @@ import fitz
 import requests
 
 from app.config.app_config import VisionLanguageConfig
+from app.config.paths import ROOT_DIR
 
 LLM_REQUEST_FILE_NAME = "llm_request.txt"
+PROMPT_FILE = ROOT_DIR / "PROMPT.txt"
+SECTION_SEPARATOR = "!" * 20
+PDF_XML_TAGS = {"LabelFoto", "TDElectronicView"}
 
 
 class EmptyOllamaResponseError(RuntimeError):
@@ -48,6 +53,45 @@ def _pdf_payloads(label_pdf_paths: list[Path]) -> list[dict[str, Any]]:
             }
         )
     return payloads
+
+
+def _whole_pdf_payloads(pdf_paths: list[Path]) -> list[dict[str, Any]]:
+    payloads = []
+    for pdf_path in pdf_paths:
+        payloads.append(
+            {
+                "file": str(pdf_path),
+                "contentType": "application/pdf",
+                "pdfBase64": base64.b64encode(pdf_path.read_bytes()).decode("utf-8"),
+            }
+        )
+    return payloads
+
+
+def _decode_xml_content(xml_content: bytes) -> str:
+    try:
+        return xml_content.decode("utf-8")
+    except UnicodeDecodeError:
+        return xml_content.decode("utf-8", errors="replace")
+
+
+def _local_name(tag: str) -> str:
+    return tag.rsplit("}", 1)[-1]
+
+
+def _xml_without_pdf_content(xml_content: bytes) -> str:
+    try:
+        root = ET.fromstring(xml_content)
+    except ET.ParseError:
+        return _decode_xml_content(xml_content)
+
+    for element in root.iter():
+        tag_name = _local_name(element.tag)
+        text = (element.text or "").strip()
+        if tag_name in PDF_XML_TAGS and text.startswith("JVBERi0"):
+            element.text = "[PDF_CONTENT_REMOVED]"
+
+    return ET.tostring(root, encoding="unicode")
 
 
 def _document_checks(extracted_values: dict[str, Any]) -> list[dict[str, Any]]:
@@ -176,45 +220,20 @@ def _build_llm_request_text(
     incoming_json: dict[str, Any],
     extracted_values: dict[str, Any],
     header: dict[str, Any],
+    xml_content: bytes,
 ) -> str:
-    messages = [
+    prompt_text = PROMPT_FILE.read_text(encoding="utf-8")
+    pdf_payload = json.dumps(
         {
-            "role": "system",
-            "content": (
-                "Ты LLM-VL. Ниже один раз загружены PDF этикеток в виде base64 PNG-страниц. "
-                "Далее идут отдельные вопросы по этим PDF. На каждый вопрос сравни информацию "
-                "на этикетке с фактическими XML-значениями по указанному критерию."
-            ),
+            "ticketHeader": header,
+            "incomingRequests": _iter_incoming_requests(incoming_json),
+            "productFieldReferenceAndXmlValues": _question_payloads(incoming_json, extracted_values),
+            "pdfFiles": _whole_pdf_payloads(label_pdf_paths),
         },
-        {
-            "role": "user",
-            "content": {
-                "type": "label_pdf_upload",
-                "ticketHeader": header,
-                "pdfFiles": _pdf_payloads(label_pdf_paths),
-            },
-        },
-    ]
-
-    for question in _question_payloads(incoming_json, extracted_values):
-        messages.append(
-            {
-                "role": "user",
-                "content": {
-                    "type": "field_check_question",
-                    **question,
-                    "answerFormat": {
-                        "requestId": question.get("requestId"),
-                        "verdict": "MATCH | MISMATCH | UNKNOWN",
-                        "labelValue": "value found on label or null",
-                        "xmlValue": "value from actualXmlValues or null",
-                        "explanation": "short reason",
-                    },
-                },
-            }
-        )
-
-    return json.dumps({"messages": messages}, ensure_ascii=False, indent=2)
+        ensure_ascii=False,
+        indent=2,
+    )
+    return f"{prompt_text}\n{SECTION_SEPARATOR}\n{_xml_without_pdf_content(xml_content)}\n{SECTION_SEPARATOR}\n{pdf_payload}"
 
 
 def _build_prompt(extracted_values: dict[str, Any]) -> str:
@@ -312,6 +331,7 @@ def extract_label_values(
     label_pdf_paths: list[Path],
     extracted_values: dict[str, Any],
     incoming_json: dict[str, Any],
+    xml_content: bytes,
     header: dict[str, Any],
     ticket_dir: Path,
     config: VisionLanguageConfig,
@@ -326,6 +346,7 @@ def extract_label_values(
             incoming_json=incoming_json,
             extracted_values=extracted_values,
             header=header,
+            xml_content=xml_content,
         )
         _save_raw_response_text(request_text, config)
         result = {
