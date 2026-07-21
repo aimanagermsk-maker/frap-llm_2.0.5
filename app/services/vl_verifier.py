@@ -1,5 +1,6 @@
 import base64
 import json
+import traceback
 from pathlib import Path
 from typing import Any
 
@@ -125,12 +126,25 @@ def _ollama_response_without_context(ollama_response: dict[str, Any]) -> dict[st
     return cleaned_response
 
 
-def _save_raw_response_text(raw_response: str, ticket_id: str, config: VisionLanguageConfig) -> Path:
+def _save_raw_response_text(text: str, ticket_id: str, config: VisionLanguageConfig) -> Path:
     response_text_dir = Path(config.response_text_dir)
     response_text_dir.mkdir(parents=True, exist_ok=True)
     response_text_path = response_text_dir / f"{ticket_id}_llm_response.txt"
-    response_text_path.write_text(raw_response, encoding="utf-8")
+    response_text_path.write_text(text, encoding="utf-8")
     return response_text_path
+
+
+def _error_response_text(exc: Exception) -> str:
+    return "\n".join(
+        [
+            "LLM request failed.",
+            f"errorType: {type(exc).__name__}",
+            f"error: {exc}",
+            "",
+            "traceback:",
+            traceback.format_exc(),
+        ]
+    )
 
 
 def extract_label_values(
@@ -142,37 +156,52 @@ def extract_label_values(
 ) -> Path:
     output_path = ticket_dir / "llm_label_values.json"
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    response_text_path = _save_raw_response_text(
+        "LLM response file created before request.\nstatus: NOT_STARTED\n",
+        ticket_dir.name,
+        config,
+    )
 
     if not config.enabled:
+        response_text_path.write_text(
+            "LLM request skipped.\nreason: VL extraction is disabled\n",
+            encoding="utf-8",
+        )
         result = {
             "ticketId": ticket_dir.name,
             "header": header,
             "status": "SKIPPED",
             "reason": "VL extraction is disabled",
+            "rawResponseTextFile": str(response_text_path),
             "labelPdfFiles": [str(path) for path in label_pdf_paths],
             "requiredFields": _required_label_fields(extracted_values),
         }
     elif not label_pdf_paths:
+        response_text_path.write_text(
+            "LLM request skipped.\nreason: No LabelFoto PDF files found\n",
+            encoding="utf-8",
+        )
         result = {
             "ticketId": ticket_dir.name,
             "header": header,
             "status": "SKIPPED",
             "reason": "No LabelFoto PDF files found",
+            "rawResponseTextFile": str(response_text_path),
             "labelPdfFiles": [],
             "requiredFields": _required_label_fields(extracted_values),
         }
     else:
-        prompt = _build_prompt(extracted_values)
         prompt_path = ticket_dir / "vl_prompt.txt"
-        prompt_path.write_text(prompt, encoding="utf-8")
         try:
+            prompt = _build_prompt(extracted_values)
+            prompt_path.write_text(prompt, encoding="utf-8")
             images_b64: list[str] = []
             for pdf_path in label_pdf_paths:
                 images_b64.extend(_pdf_to_base64_pages(pdf_path))
 
             ollama_response = _send_to_ollama(images_b64, prompt, config)
             raw_response = ollama_response["response"]
-            response_text_path = _save_raw_response_text(raw_response, ticket_dir.name, config)
+            response_text_path.write_text(raw_response, encoding="utf-8")
             result = {
                 "ticketId": ticket_dir.name,
                 "header": header,
@@ -190,6 +219,10 @@ def extract_label_values(
                 "ollamaResponse": _ollama_response_without_context(ollama_response),
             }
         except EmptyOllamaResponseError as exc:
+            response_text_path.write_text(
+                json.dumps(_ollama_response_without_context(exc.ollama_response), ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
             result = {
                 "ticketId": ticket_dir.name,
                 "header": header,
@@ -200,11 +233,13 @@ def extract_label_values(
                 "url": config.url,
                 "jsonMode": config.json_mode,
                 "promptFile": str(prompt_path),
+                "rawResponseTextFile": str(response_text_path),
                 "labelPdfFiles": [str(path) for path in label_pdf_paths],
                 "requiredFields": _required_label_fields(extracted_values),
                 "ollamaResponse": _ollama_response_without_context(exc.ollama_response),
             }
         except Exception as exc:
+            response_text_path.write_text(_error_response_text(exc), encoding="utf-8")
             result = {
                 "ticketId": ticket_dir.name,
                 "header": header,
@@ -215,6 +250,7 @@ def extract_label_values(
                 "url": config.url,
                 "jsonMode": config.json_mode,
                 "promptFile": str(prompt_path),
+                "rawResponseTextFile": str(response_text_path),
                 "labelPdfFiles": [str(path) for path in label_pdf_paths],
                 "requiredFields": _required_label_fields(extracted_values),
             }
